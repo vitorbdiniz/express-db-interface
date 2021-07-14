@@ -259,6 +259,37 @@ def insert_article(Id=None,LectureId=None,LectureName=None,CourseName=None, Modu
     return code
 
 
+def insert_refference(Id=None, LectureId=None, CourseName=None, ModuleName=None, LectureName=None, ReffUrl=None, Order=None, Title=None, Description=None):
+    if Id is None:
+        Id = go_get_id()
+
+    if LectureId is None:
+        query = f"""
+                SELECT Id
+                FROM Lecture
+                WHERE ModuleId IN (
+                                    SELECT Id
+                                    FROM Module AS M 
+                                    WHERE CourseId IN ( SELECT Id FROM Course WHERE Title='{CourseName}') AND Title='{ModuleName}'
+                                    ) AND Tittle='{LectureName}';
+        """
+        LectureId = execute_query(query)[0].iloc[0]
+
+    new_line ={
+        'Id':Id,
+        'LectureId':LectureId,
+        'ReffUrl':ReffUrl,
+        'Order':Order,
+        'Title':Title,
+        'Description':Description
+    }
+
+    code = create_sql('Refference','insert', enter_cols=False, dic=new_line)
+    execute_DML(code)
+    add_to_backlog(code)
+    return code
+
+
 def file_get_infos(data):
     result = []
     for i in range(data.shape[0]):
@@ -285,7 +316,8 @@ def file_get_infos(data):
                                     WHERE CourseId IN ( SELECT Id FROM Course WHERE Title='{CourseName}') AND Title='{ModuleName}'
                                     ) AND Tittle='{LectureName}';
         """
-        lecture_id = execute_query(query)[0].iloc[0]
+        lecture_id = execute_query(query)
+        lecture_id = lecture_id[0].iloc[0]
 
         agg = {'lecture_id':lecture_id, 'order':order, 'title':name}
         print(agg)
