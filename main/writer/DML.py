@@ -67,11 +67,12 @@ funções de abstração da conexão com o BD
 
 '''
 
-def insert_trail(table, id=None, title='', description='', active=1, backgroundUrlBanner='', backgroundUrlDesktop='', backgroundUrlMobile='', createAt=None, updatedAt=None):
+def insert_trail(table, id=None, title='', description='', active=1, backgroundUrlBanner='', backgroundUrlDesktop='', backgroundUrlMobile='', createAt=None, updatedAt=None, LearningLevelId=None):
     if id is None:
         id = go_get_id()
     if createAt is None:
         createAt = get_date()
+    
     new_line = {
         'Id':id,
         'Title':title, 
@@ -88,13 +89,20 @@ def insert_trail(table, id=None, title='', description='', active=1, backgroundU
     add_to_backlog(code)
     return code
 
-def insert_course(table, id=None, productId=0, courseSlug=None, title='', objective=None, certification=None,certificationActive=0, targetAudience=None, workload=None, timeAvailable=None, topics=None, backgroundUrl='', sequential=1, categoryId='', createAt=None, published=1,subscriptionsCount=0, active=1, dropoutPercentage=110, isOpenCourse=0, imgMobileUrl=None, imgBannerUrl=None):
+def insert_course(table, id=None, productId=0, courseSlug=None, title='', objective=None, certification=None,certificationActive=0, targetAudience=None, workload=None, timeAvailable=None, topics=None, backgroundUrl='', sequential=1, categoryId='', createAt=None, published=1,subscriptionsCount=0, active=1, dropoutPercentage=110, isOpenCourse=0, imgMobileUrl=None, imgBannerUrl=None, LearningLevelId=None):
     if id is None:
         id = go_get_id()
     if createAt is None:
         createAt = get_date()
     if courseSlug is None:
         courseSlug = get_slug(title)
+
+    LearningLevelId = {
+        None : None,
+        'Avançado': '7d8o5pn1w4s99x7kh4qbgjzbz',
+        'Intermediário': 'ksbwmxy1d713xwygx8uo8r4eg',
+        'Básico': 'wi8686cdxt91cog3qbh9uyoo9'
+    }[LearningLevelId]
 
     new_line = {
         'Id' : id, 
@@ -118,7 +126,8 @@ def insert_course(table, id=None, productId=0, courseSlug=None, title='', object
         'DropoutPercentage' : dropoutPercentage, 
         'IsOpenCourse' : isOpenCourse, 
         'ImgMobileUrl' : imgMobileUrl, 
-        'ImgBannerUrl' : imgBannerUrl
+        'ImgBannerUrl' : imgBannerUrl,
+        'LearningLevelId':LearningLevelId
     }
     code = create_sql(table,'insert', dic=new_line)
     execute_DML(code)
@@ -270,8 +279,8 @@ def insert_refference(Id=None, LectureId=None, CourseName=None, ModuleName=None,
                 WHERE ModuleId IN (
                                     SELECT Id
                                     FROM Module AS M 
-                                    WHERE CourseId IN ( SELECT Id FROM Course WHERE Title='{CourseName}') AND Title='{ModuleName}'
-                                    ) AND Tittle='{LectureName}';
+                                    WHERE CourseId IN ( SELECT Id FROM Course WHERE Title="{CourseName}") AND Title="{ModuleName}"
+                                    ) AND Tittle="{LectureName}";
         """
         LectureId = execute_query(query)[0].iloc[0]
 
@@ -321,10 +330,6 @@ def file_get_infos(data):
 
         agg = {'lecture_id':lecture_id, 'order':order, 'title':name}
         print(agg)
-        js = json.dumps(agg, indent = 4).encode('utf-8')
-        f = open(f'{CourseName} - {name}.json', 'wb')
-        f.write(js)
-
         result.append( agg )
     return result
 
