@@ -23,14 +23,14 @@ def main(insert, data=None, trail=None, update=False, order=1, productId=None, C
         result = writer.insert_course( 'Course',
             productId=productId,
             title=data['Curso'].iloc[0], 
-            objective='Neste curso nós apresentamos uma introdução às finanças descentralizadas e te mostramos como utilizar os principais protocolos utilizando a carteira Web 3.0 MetaMask.', 
+            objective='Aprenda os conceitos essenciais da regulação emocional e metodologias para tomada de decisão, desenvolvendo soft skills necessárias ao dia a dia do investidor: inteligência emocional, pensamento crítico e tomada de decisão.', 
             certification=None,
             certificationActive=0,
             targetAudience=None, 
             workload=None, 
             timeAvailable=None, 
             topics=None, 
-            backgroundUrl='https://tc.com.br/wp-content/uploads/2021/07/defi_thumb.png',
+            backgroundUrl='https://tc.com.br/wp-content/uploads/2021/09/Inteligencia-Emocional-Desktop_357x272.jpg',
             sequential=1, 
             categoryId='5db1a95f0b19960058b9e188', 
             published=1,
@@ -38,10 +38,10 @@ def main(insert, data=None, trail=None, update=False, order=1, productId=None, C
             active=1, 
             dropoutPercentage=110.00, 
             isOpenCourse=0,
-            imgMobileUrl='https://tc.com.br/wp-content/uploads/2021/07/defi_banner_mobile.png',
-            imgBannerUrl='https://tc.com.br/wp-content/uploads/2021/07/defi_banner_web.png',
+            imgMobileUrl='https://tc.com.br/wp-content/uploads/2021/09/Inteligencia-Emocional-Mobile_375x667.jpg',
+            imgBannerUrl='https://tc.com.br/wp-content/uploads/2021/09/Inteligencia-Emocional-Desktop_1920x1080.jpg',
             courseSlug=None,
-            LearningLevelId= 'Intermediário'
+            LearningLevelId= 'Básico'
 
         )
     elif insert=='module':
@@ -136,29 +136,46 @@ def main(insert, data=None, trail=None, update=False, order=1, productId=None, C
     return result
 
 
-
-
-
 #get_inserts = lambda insert_all, item=[] : ['course', 'module', 'lecture', 'product', 'coursetrail', 'article', 'refference','file'] if insert_all else item #'trail'
-get_inserts = lambda insert_all, item=[] : ['course', 'module', 'lecture', 'product', 'article', 'refference','file'] if insert_all else item #'trail'
+#get_inserts = lambda insert_all, item=[] : ['course', 'module', 'lecture', 'product', 'article', 'refference','file'] if insert_all else item #'trail'
 
-insert_all = True
-item = ['file'] if not insert_all else []
+def get_inserts(insert_all, insert_in_trail=False, item=[]):
+    if insert_all:
+        inserts = ['course', 'module', 'lecture', 'product', 'article', 'refference','file'] #'trail'
+        if insert_in_trail:
+            inserts.append('coursetrail')
+    else:
+        inserts = item
+    return inserts
+
+
+insert_all = False
+insert_in_trail = False
+
+if not insert_all:
+    item = ['lecture', 'file']
+else:
+    item = []
 
 env = 'hml'
 
-trail = ''
-CourseTrailOrder=1
-productId = 69
-turmas = [1,2]
+trail = 'Aprenda a Investir'
+CourseTrailOrder=9
+productId = 100
+turmas = [7]
 
-name = 'defi.csv'
-data = pd.read_csv(f'~/Downloads/TCSchool - files/{name}')
+name = 'experience.csv'
+path = f'~/Documentos/TC/Academy/TCSchool - files/{name}'
 
-for insert in get_inserts( insert_all, item ):
-    if 'experience.csv' == name:
+if name.split('.')[-1] == 'csv':
+    data = pd.read_csv(path)
+else:
+    data = pd.read_excel(path)
+
+for insert in get_inserts( insert_all, insert_in_trail, item ):
+    if name == 'experience.csv':
         for turma in turmas:
-            data = pd.read_csv(f'~/Downloads/TCSchool - files/{name}') if insert not in {'trail'} else None
+            data = pd.read_csv(path) if insert not in {'trail'} else None
             productId += turma
             data['Curso'] += f' - Turma {turma}'
             result = main(insert, data=data, trail=trail, update=True, order=10, productId=productId, CourseTrailOrder=CourseTrailOrder, env=env)

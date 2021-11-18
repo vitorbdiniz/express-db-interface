@@ -153,7 +153,7 @@ def insert_module(id=None, title='', order=0, courseId=None,courseName=None, act
     add_to_backlog(code)
     return code
 
-def insert_lecture(Id=None, ModuleId=None, ModuleName='', CourseName='', LectureSlug=None, Tittle='', Description=None, CreatedAt=None, UpdatedAt=None, Question=None, Order=0, VideoId=0, Active=1, VideoDuration=None, EadboxLectureId=None, IsBonus=0):
+def insert_lecture(Id=None, ModuleId=None, ModuleName='', CourseName='', LectureSlug=None, Tittle='', Description=None, CreatedAt=None, UpdatedAt=None, Question=None, Order=0, VideoId=0, Active=1, VideoDuration=None, EadboxLectureId=None, IsBonus=0, VideoUrl=None):
     if Id is None:
         Id = go_get_id()
     if CreatedAt is None:
@@ -183,10 +183,12 @@ def insert_lecture(Id=None, ModuleId=None, ModuleName='', CourseName='', Lecture
         'Active':Active,
         'VideoDuration':VideoDuration,
         'EadboxLectureId':EadboxLectureId,
-        'IsBonus':IsBonus
+        'IsBonus':IsBonus,
+        'VideoUrl':VideoUrl
     }
 
     code = create_sql('Lecture','insert', enter_cols=False, dic=new_line)
+    print(code)
     execute_DML(code)
     add_to_backlog(code)
     return code
@@ -317,14 +319,17 @@ def file_get_infos(data):
         ModuleName = data['Nome Módulo'].iloc[i]
 
         query = f"""
-                SELECT Id
-                FROM Lecture
-                WHERE ModuleId IN (
-                                    SELECT Id
-                                    FROM Module AS M 
-                                    WHERE CourseId IN ( SELECT Id FROM Course WHERE Title='{CourseName}') AND Title='{ModuleName}'
-                                    ) AND Tittle='{LectureName}';
+            SELECT L.Id
+            FROM Lecture AS L 
+                    INNER JOIN Module AS M ON M.Id=L.ModuleId 
+                    INNER JOIN Course AS C ON M.CourseId=C.id
+            
+            WHERE   C.Title LIKE '{CourseName}' 
+                    AND M.Title LIKE '{ModuleName}'
+                    AND L.Tittle LIKE '{LectureName}'
+            ORDER BY M.Order,L.Order;
         """
+
         lecture_id = execute_query(query)
         lecture_id = lecture_id[0].iloc[0]
 
