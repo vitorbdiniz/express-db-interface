@@ -8,3 +8,4 @@ def go_get_id():
 
 def get_date():
     return int(time.time_ns() / 1000000)
+

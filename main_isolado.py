@@ -49,6 +49,5 @@ def get_time():
 #get_durations('00:15:08')
 
 #print( generate_id() )
-#print( get_time() )
+print( get_time() )
 
-print(add_test())

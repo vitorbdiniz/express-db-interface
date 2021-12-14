@@ -13,7 +13,9 @@ WHERE Title LIKE 'Aprenda a Investir'
 
 SELECT * 
 FROM Course C
-WHERE C.Title LIKE '%Turma 2%'
+ORDER BY RAND()
+LIMIT 3
+
 ;
 
 SELECT CT.CourseTrailOrder, C.*
@@ -29,20 +31,29 @@ ORDER BY CT.CourseTrailOrder ASC
 SELECT M.*
 FROM Module AS M 
 		INNER JOIN Course AS C ON M.CourseId=C.id
-WHERE 	C.Title LIKE '%Turma 2%'
+WHERE 	C.Title LIKE 'Criptomoedas: por onde começar?'
 		#AND M.Title LIKE 'Modelo de Lucro Residual'
 ORDER BY M.Order
 ;
 
-SELECT L.*
+
+SELECT C.Title Curso, M.Title Modulo, L.*
 FROM Lecture AS L 
 		INNER JOIN Module AS M ON M.Id=L.ModuleId 
 		INNER JOIN Course AS C ON M.CourseId=C.id
-WHERE   C.Title LIKE '%Gestores%'
-		#AND M.Title LIKE 'Modelo de Lucro Residual'
-		#AND L.Tittle LIKE 'Comece a investir agora!'
+WHERE   C.Title LIKE '%Turma 7%'
 ORDER BY M.Order,L.Order;
 
+SELECT C.Title Curso, M.Title Modulo, L.Tittle Aula, R.*
+FROM Lecture L 
+		INNER JOIN Module M ON M.Id=L.ModuleId 
+		INNER JOIN Course C ON M.CourseId=C.id
+        INNER JOIN Refference R ON R.LectureId=L.Id
+WHERE   C.Title LIKE 'Criptomoedas: por onde começar?'
+		#AND M.Title LIKE 'Modelo de Lucro Residual'
+		#L.Tittle LIKE 'Um investimento para o seu objetivo'
+        AND L.Active=1
+ORDER BY M.Order,L.Order;
 
 SELECT *
 FROM Resource R
@@ -54,8 +65,7 @@ FROM Resource AS R
 		INNER JOIN Lecture AS L ON R.LectureId=L.Id
 		INNER JOIN Module AS M ON M.Id=L.ModuleId 
         INNER JOIN Course AS C ON M.CourseId=C.id
-WHERE C.Title LIKE 'Análise e Avaliação de Bancos'
-		AND R.LectureId='5ebea2ffb08496007c4aa257'
+WHERE C.Title LIKE 'Criptomoedas: por onde começar?' 
 ORDER BY M.Order,L.Order, R.Order
 ;
 
@@ -83,5 +93,10 @@ FROM Annotation A
 WHERE S.UserId=@MyUserId
 ;
 
-SELECT * FROM INFORMATION_SCHEMA.TABLES
-#WHERE TABLE_ROWS = 0
+SELECT *
+FROM Category;
+
+
+SELECT * 
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_ROWS > 0
